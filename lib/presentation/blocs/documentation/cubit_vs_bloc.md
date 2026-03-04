@@ -45,7 +45,9 @@ nuevo con `copyWith`.
 
 ### Inmutabilidad y copyWith()
 ```dart
+---------------------------------------------------------------------------
 final newState = state.copyWith(counter: state.counter + 1);
+---------------------------------------------------------------------------
 ```
 `copyWith` devuelve un nuevo `CounterState` con los campos actualizados y los
 restantes heredados del estado anterior.
@@ -64,10 +66,13 @@ como una clase con métodos que llaman directamente a `emit()`.
 
 ### counter_state.dart (Cubit)
 ```dart
+---------------------------------------------------------------------------
 class CounterState extends Equatable {
   final int counter;
   final int transactionCount;
+  
   const CounterState({this.counter = 0, this.transactionCount = 0});
+  
   copyWith({int? counter, int? transactionCount}) =>
       CounterState(
         counter: counter ?? this.counter,
@@ -75,12 +80,17 @@ class CounterState extends Equatable {
       );
   @override List<Object> get props => [counter, transactionCount];
 }
+---------------------------------------------------------------------------
 ```
+El get props se utiliza para comparar los CounterState y que Equatable 
+identifique si ha habido cambios.
+
 Valores por defecto 0; sin embargo el cubit se inicializa manualmente con
 `counter: 5` en su constructor.
 
 ### counter_cubit.dart
 ```dart
+---------------------------------------------------------------------------
 class CounterCubit extends Cubit<CounterState> {
   CounterCubit() : super(const CounterState(counter: 5));
 
@@ -95,6 +105,7 @@ class CounterCubit extends Cubit<CounterState> {
     emit(state.copyWith(counter: 0));
   }
 }
+---------------------------------------------------------------------------
 ```
 
 #### Flujo de trabajo
@@ -127,12 +138,14 @@ BLoC (Business Logic Component) separa la lógica en tres piezas:
 
 ### counter_event.dart
 ```dart
+---------------------------------------------------------------------------
 abstract class CounterEvent { const CounterEvent(); }
 class CounterIncreased extends CounterEvent {
   final int value;
   const CounterIncreased(this.value);
 }
 class CounterReset extends CounterEvent {}
+---------------------------------------------------------------------------
 ```
 Cada evento es una clase inmutable. `CounterIncreased` lleva el valor a sumar.
 
@@ -141,14 +154,14 @@ Simétrico al del Cubit, pero con valor inicial 10.
 
 ### counter_bloc.dart
 ```dart
+---------------------------------------------------------------------------
 class CounterBloc extends Bloc<CounterEvent, CounterState> {
   CounterBloc() : super(const CounterState()) {
     on<CounterIncreased>(_onCounterIncreased);
     on<CounterReset>(_onCounterReset);
   }
 
-  void _onCounterIncreased(
-      CounterIncreased event, Emitter<CounterState> emit) {
+  void _onCounterIncreased(CounterIncreased event, Emitter<CounterState> emit) {
     emit(state.copyWith(
       counter: state.counter + event.value,
       transactionCount: state.transactionCount + 1,
@@ -163,6 +176,7 @@ class CounterBloc extends Bloc<CounterEvent, CounterState> {
   void increaseBy([int value = 1]) => add(CounterIncreased(value));
   void resetCounter() => add(CounterReset());
 }
+---------------------------------------------------------------------------
 ```
 
 #### Flujo de trabajo BLoC
@@ -216,11 +230,13 @@ torna más explícito.
 
 ```mermaid
 flowchart TD
+    
     subgraph Cubit
       U1(User) -->|call increaseBy| C1(CounterCubit)
       C1 -->|emit new state| S1[CounterState]
       S1 -->|rebuild| W1(UI)
     end
+    
     subgraph BLoC
       U2(User) -->|call increaseBy| B1(CounterBloc)
       B1 -->|add event| E1[CounterIncreased]
