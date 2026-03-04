@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "FormsApp - Flutter (Debug)",
+            "request": "launch",
+            "type": "flutter",
+            "program": "lib/main.dart",
+            "cwd": "${workspaceFolder}",
+            "args": []
+        },
+        {
+            "name": "FormsApp - Flutter (Release)",
+            "request": "launch",
+            "type": "flutter",
+            "program": "lib/main.dart",
+            "releaseMode": true,
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
